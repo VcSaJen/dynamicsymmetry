@@ -67,7 +67,9 @@ public class WEBridge {
         WESelection result;
 
         LocalSession curLocSession = getPlayerLocalSession(player);
-        RegionSelector regionSelector = curLocSession.getRegionSelector(curLocSession.getSelectionWorld());
+        com.sk89q.worldedit.world.World w = curLocSession.getSelectionWorld();
+        if (w == null) return Optional.empty();
+        RegionSelector regionSelector = curLocSession.getRegionSelector(w);
         Region sel;
         if (!regionSelector.isDefined()) return Optional.empty();
         try {
