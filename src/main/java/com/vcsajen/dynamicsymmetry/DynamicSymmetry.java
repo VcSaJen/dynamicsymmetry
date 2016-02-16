@@ -21,18 +21,20 @@ public class DynamicSymmetry
 {
     private Game game;
     private WESelection sel;
+    private SpLocalization spLoc;
 
     public CommandResult executehw(CommandSource src, CommandContext args) throws CommandException
     {
-        try {
-            WESelection sel = WEBridge.getSelection((Player) src).get();
-            src.sendMessage(Text.of("Hello World!"));
-            src.sendMessage(Text.of("Sel: " + sel.minPos.toString() + " " + sel.maxPos.toString() + " World: " + sel.world.getName()));
+        /*try {*/
+            //WESelection sel = WEBridge.getSelection((Player) src).get();
+            //src.sendMessage(Text.of("Hello World!"));
+            spLoc.sendMessage(src, "test.helloworld");
+            //src.sendMessage(Text.of("Sel: " + sel.minPos.toString() + " " + sel.maxPos.toString() + " World: " + sel.world.getName()));
             return CommandResult.success();
-        } catch (WorldNotFoundException e) {
+        /*} catch (WorldNotFoundException e) {
             src.sendMessage(Text.of(TextColors.RED, "Selection world could not be found!"));
             return CommandResult.empty();
-        }
+        }*/
     }
 
     public CommandResult executetest2(CommandSource src, CommandContext args) throws CommandException
@@ -45,7 +47,8 @@ public class DynamicSymmetry
         }
         try {
             WEBridge.setSelection((Player) src, sel);
-            src.sendMessage(Text.of("Selected!"));
+            //src.sendMessage(Text.of("Selected!"));
+            spLoc.sendMessage(src, "test.selSuccess");
             return CommandResult.success();
         } catch (WorldNotFoundException e) {
             src.sendMessage(Text.of(TextColors.RED, "Selection world could not be found!"));
@@ -72,5 +75,7 @@ public class DynamicSymmetry
 
         game.getCommandManager().register(this, myCommandSpec, "helloworld", "hello", "test");
         game.getCommandManager().register(this, myCommandSpec2, "test2");
+
+        spLoc = new SpLocalization();
     }
 }
