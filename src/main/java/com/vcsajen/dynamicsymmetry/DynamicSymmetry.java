@@ -13,13 +13,16 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.text.action.HoverAction;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-
-import java.util.Optional;
+import org.slf4j.Logger;
 
 @Plugin(id = "dynamicsymmetry", name = "DynamicSymmetry", version = "1.0")
 public class DynamicSymmetry
@@ -30,15 +33,29 @@ public class DynamicSymmetry
     @Inject
     private PluginManager pluginManager;
 
+    @Inject
+    private Logger logger;
+
     private WESelection sel;
     private SpLocalization spLoc;
-    private boolean weAwailable;
+    private boolean weAvailable;
 
     public CommandResult executehw(CommandSource src, CommandContext args) throws CommandException
     {
-        try {
+
+        //src.sendMessage(Text.of(""));
+        ItemStack itemStack = ((Player)src).getItemInHand().orElse(ItemStack.of(ItemTypes.BEDROCK,1));
+        src.sendMessage(Text.builder(itemStack).onHover(TextActions.showItem(itemStack)).build());
+        //((Player)src).getName();
+        String playerName = src.getName();
+        //src.sendMessage(Text.builder(playerName).onHover(TextActions.showEntity(((Player)src).getUniqueId(), playerName, ((Player)src).getType())).build());
+
+        spLoc.sendNonLocalizedMessage(src, "{2}: {1}, {0}", itemStack, 24.1001, src);
+
+        return CommandResult.success();
+        /*try {
             spLoc.sendMessage(src, "test.helloworld");
-            if (!weAwailable) return CommandResult.empty();
+            if (!weAvailable) return CommandResult.empty();
 
             if (!(src instanceof Player)) return CommandResult.empty();
 
@@ -49,12 +66,12 @@ public class DynamicSymmetry
         } catch (WorldNotFoundException e) {
             src.sendMessage(Text.of(TextColors.RED, "Selection world could not be found!"));
             return CommandResult.empty();
-        }
+        }*/
     }
 
     public CommandResult executetest2(CommandSource src, CommandContext args) throws CommandException
     {
-        if (!weAwailable) return CommandResult.empty();
+        if (!weAvailable) return CommandResult.empty();
         if (sel==null) {
             sel = new WESelection();
             sel.world = Sponge.getServer().getWorld("world").get();
@@ -75,20 +92,21 @@ public class DynamicSymmetry
     @Listener
     public void onGamePostInitialization(GamePostInitializationEvent event)
     {
-        weAwailable = pluginManager.isLoaded("worldedit");
+        weAvailable = pluginManager.isLoaded("worldedit");
     }
 
     @Listener
     public void onGameInitialization(GameInitializationEvent event)
     {
         CommandSpec myCommandSpec = CommandSpec.builder()
-                .description(Text.of("Hello World Command"))
+                .description(TranslationHelper.t("command.helloworld.desc"))
+                .extendedDescription(TranslationHelper.t("command.helloworld.desc"))
                 .permission("myplugin.command.helloworld")
                 .executor(this::executehw)
                 .build();
 
         CommandSpec myCommandSpec2 = CommandSpec.builder()
-                .description(Text.of("Test Command 2"))
+                .description(TranslationHelper.t("command.test2.desc"))
                 .permission("myplugin.command.test2")
                 .executor(this::executetest2)
                 .build();
@@ -96,6 +114,6 @@ public class DynamicSymmetry
         game.getCommandManager().register(this, myCommandSpec, "helloworld", "hello", "test");
         game.getCommandManager().register(this, myCommandSpec2, "test2");
 
-        spLoc = new SpLocalization();
+        spLoc = new SpLocalization(logger);
     }
 }
