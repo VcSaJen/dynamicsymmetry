@@ -28,7 +28,7 @@ public class TranslationHelper {
 
     private TranslationHelper() {} // Prevent instance creation
 
-    public static Text t(String key, Object... args) {
+    public static Text getTranslatedText(String key, Object... args) {
         Translation tr = new ResourceBundleTranslation(key, LOOKUP_FUNC);
         return TranslatableText.builder(tr).build();
     }

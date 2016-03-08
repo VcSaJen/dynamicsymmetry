@@ -57,6 +57,17 @@ public class SpLocalization {
         return getNonLocalizedStringWithFormat(locale, b1.getString(localizationKey), params);
     }
 
+    public static String getStringWithoutFormat(Locale locale, String localizationKey)
+    {
+        UResourceBundle b1 = UResourceBundle.getBundleInstance("com/vcsajen/dynamicsymmetry/lang", locale);
+        return b1.getString(localizationKey);
+    }
+
+    public static Text getTextWithoutFormat(Locale locale, String localizationKey)
+    {
+        return Text.of(getStringWithoutFormat(locale, localizationKey));
+    }
+
     public void sendRawMessage(CommandSource src, String msg)
     {
         src.sendMessage(Text.of(msg));
@@ -128,6 +139,9 @@ public class SpLocalization {
 
         Set<AttributedCharacterIterator.Attribute> attributes = charIterator.getAllAttributeKeys();
         Text.Builder tb = Text.builder();
+
+        int lastInd = 0;
+
         for (AttributedCharacterIterator.Attribute attr: attributes) {
             if (!attr.equals(MessageFormat.Field.ARGUMENT)) continue;
             Object f;
@@ -146,7 +160,7 @@ public class SpLocalization {
                 if (f!=null)
                   deque.add(new ParamPos((Integer)f,start,end));
             }
-            int lastInd = 0;
+            lastInd = 0;
             while (deque.peek()!=null)
             {
                 ParamPos p = deque.poll();
@@ -160,12 +174,12 @@ public class SpLocalization {
 
                 lastInd = p.end;
             }
-            if (lastInd<buf.length()-1)
-                tb.append(Text.of(stripNonprintableCharacters(buf.substring(lastInd, buf.length()))));
 
             //logger.debug("Attr: {"+f+"}");
             //logger.debug(sb.toString());
         }
+        if (lastInd<buf.length()-1)
+            tb.append(Text.of(stripNonprintableCharacters(buf.substring(lastInd, buf.length()))));
 
         return tb.build();
     }
